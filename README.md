@@ -38,7 +38,7 @@ python3 wscan.py -h
 ## Options/Usage
 
 ```
-usage: main.py [-h] -u target url [-p] [-f first port] [-l last port]
+usage: main.py [-h] -u target url [-c] [-r] [-i] [-a] [-p] [-f first port] [-l last port]
 
 WScan - Web Server Scanner
 
@@ -46,6 +46,10 @@ options:
   -h, --help            show this help message and exit
   -u target url, --url target url
                         target url ( format=example.com )
+  -c, --links           collect links + status codes
+  -r, --head            server header
+  -i, --ipv4            ipv4 informations
+  -a, --all             complete scan
   -p, --pscan           add port scan to main scan
   -f first port, --first first port
                         the first port for port scan if enabled
@@ -53,8 +57,10 @@ options:
                         the last port for port scan if enabled
 
 examples:
-  wscan.py -u example.com
+  wscan.py -u example.com -f 1 -l 100 -a -u example.com
+  wscan.py -u example.com -r -i -u example.com
   wscan.py -u example.com -p -f 50 -l 100
+
 ```
 
 ## 🎬 WScan Example
