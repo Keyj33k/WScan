@@ -10,7 +10,8 @@
 - server details like ipv4/ipv6 addresses, status code and the HTTP header<br>
 - all links with the associated status codes<br>
 - ipv4 data like country, region, city, lat, lon, timezone etc.<br>
-- optional port scanning config with service detection
+- optional port scanning config with service detection<br>
+- scan target server for subdomains
 
 ## :rocket: Getting Started: 
 
@@ -38,7 +39,7 @@ python3 wscan.py -h
 ## Options/Usage
 
 ```
-usage: wscan.py [-h] -u target url [-c] [-r] [-i] [-a] [-p] [-f first port] [-l last port]
+usage: main.py [-h] -u target url [-a] [-c] [-r] [-i] [-s] [-w wordlist] [-p] [-f first port] [-l last port]
 
 WScan - Web Server Scanner
 
@@ -46,10 +47,13 @@ options:
   -h, --help            show this help message and exit
   -u target url, --url target url
                         target url ( format=example.com )
+  -a, --all             complete scan
   -c, --links           collect links + status codes
   -r, --head            server header
   -i, --ipv4            ipv4 informations
-  -a, --all             complete scan
+  -s, --sub             scan for subdomains
+  -w wordlist, --wordl wordlist
+                        wordlist for subdomain scanning
   -p, --pscan           port scan
   -f first port, --first first port
                         the first port for port scan if enabled
