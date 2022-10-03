@@ -11,13 +11,14 @@ try:
     from datetime import datetime
     from socket import gaierror, herror
     from urllib.parse import urlparse
+    from sys import exit
+    from time import sleep
 except ImportError:
     raise RuntimeError(('cannot run wscan because of missing modules. '
                         'Run "pip3 install -r requirements.txt" to fix this issue.'))
 
 """
 wscan - Web Server Scanner
-
 Author: Keyjeek
 Date: 03.10.22
 Version: 0.0.2
@@ -88,6 +89,25 @@ class WScan:
         for category, result in get(addr_conv(self.uniformresourcelocator)).headers.items():
             print(f"{category}: {result}")
 
+    def subdomain_scanner(self, database):
+        active_domains = 0
+        with open(database, 'r') as file:
+            for list_domains in file.read().splitlines():
+                uniformresourcelocator = f"http://{list_domains}.{self.uniformresourcelocator}"
+                sleep(1.25)
+
+                try:
+                    get(uniformresourcelocator)
+                    print((f"subdomain found: {uniformresourcelocator} ->" 
+                           f" status code: {get(uniformresourcelocator).status_code}"))
+                    active_domains += 1
+                except (ConnectionError, MissingSchema):
+                    pass
+
+        if active_domains == 0:
+            print("No subdomains were found, try another wordlist")
+            exit(1)
+
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="WScan - Web Server Scanner")
@@ -95,10 +115,13 @@ if __name__ == "__main__":
                         version="wscan - Web Server Scanner, Version 0.0.2", help=SUPPRESS)
     parser.add_argument("-u", "--url", type=str, metavar="target url",
                         help="target url ( format=example.com )", required=True)
+    parser.add_argument("-a", "--all", action="store_true", help="complete scan")
     parser.add_argument("-c", "--links", action="store_true", help="collect links + status codes")
     parser.add_argument("-r", "--head", action="store_true", help="server header")
     parser.add_argument("-i", "--ipv4", action="store_true", help="ipv4 informations")
-    parser.add_argument("-a", "--all", action="store_true", help="complete scan")
+    parser.add_argument("-s", "--sub", action="store_true", help="scan for subdomains")
+    parser.add_argument("-w", "--wordl", type=str, metavar="wordlist",
+                        help="wordlist for subdomain scanning")
     parser.add_argument("-p", "--pscan", action="store_true", help="port scan")
     parser.add_argument("-f", "--first", type=int, metavar="first port",
                         help="the first port for port scan if enabled")
@@ -120,6 +143,9 @@ if __name__ == "__main__":
     elif (vars(args)["pscan"] is True and vars(args)["first"] is None
           or vars(args)["pscan"] is True and vars(args)["last"] is None):
         display_help()
+    elif vars(args)["sub"] is True and vars(args)["wordl"] is None:
+        print("you forgot to enter a wordlist")
+        exit(1)
 
     try:
         wscan = WScan(args.url, args.first, args.last)
@@ -138,6 +164,15 @@ if __name__ == "__main__":
                f"status code: {wscan.status_code()}\n"
                f"addresses: {wscan.ipv4_addr()}\n"))
 
+        if vars(args)["all"] is True:
+            print(f"\nhttp response header\n{'=' * 60}")
+            wscan.http_header()
+            print(f"\nipv4 address data\n{'=' * 60}")
+            wscan.ip_data()
+            print(f"\navailable links\n{'=' * 60}")
+            wscan.links()
+            print(f"\nopen ports\n{'=' * 60}")
+            wscan.port_scan()
         if vars(args)["head"] is True:
             print(f"\nhttp response header\n{'=' * 60}")
             wscan.http_header()
@@ -150,15 +185,9 @@ if __name__ == "__main__":
         if vars(args)["pscan"] is True:
             print(f"\nopen ports\n{'=' * 60}")
             wscan.port_scan()
-        if vars(args)["all"] is True:
-            print(f"\nhttp response header\n{'=' * 60}")
-            wscan.http_header()
-            print(f"\nipv4 address data\n{'=' * 60}")
-            wscan.ip_data()
-            print(f"\navailable links\n{'=' * 60}")
-            wscan.links()
-            print(f"\nopen ports\n{'=' * 60}")
-            wscan.port_scan()
+        if vars(args)["sub"] is True:
+            print(f"\nactive subdomains\n{'=' * 60}")
+            wscan.subdomain_scanner("subdomains.txt") if args.wordl == "default" else wscan.subdomain_scanner(args.wordl)
 
         print((f"\n\nwscan done\n{'=' * 60}\n"
                f"scanned {args.url} in {datetime.now() - scan_start}"))
@@ -168,4 +197,5 @@ if __name__ == "__main__":
         print("\ninvalid url, use a format like this: example.com")
     except (ConnectionError, herror):
         print(f"\ncannot scan {args.url}")
-    
+    except FileNotFoundError:
+        print(f"subdomain scanning failed: wordlist is missing")
