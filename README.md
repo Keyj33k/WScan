@@ -50,7 +50,7 @@ options:
   -r, --head            server header
   -i, --ipv4            ipv4 informations
   -a, --all             complete scan
-  -p, --pscan           add port scan to main scan
+  -p, --pscan           port scan
   -f first port, --first first port
                         the first port for port scan if enabled
   -l last port, --last last port
