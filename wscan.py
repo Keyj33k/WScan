@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python3
 
 try:
     from socket import socket, AF_INET, SOCK_STREAM, getservbyport
