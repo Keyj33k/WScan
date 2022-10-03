@@ -57,8 +57,8 @@ options:
                         the last port for port scan if enabled
 
 examples:
-  wscan.py -u example.com -f 1 -l 100 -a -u example.com
-  wscan.py -u example.com -r -i -u example.com
+  wscan.py -f 1 -l 100 -a -u example.com
+  wscan.py -r -u example.com -i
   wscan.py -u example.com -p -f 50 -l 100
 
 ```
