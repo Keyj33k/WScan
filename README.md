@@ -26,7 +26,11 @@ sudo apt-get install python3
 ```
 git clone https://github.com/Keyj33k/WScan.git
 ```
-4 ) `Run wscan` using the following command:
+4 ) Install the needed requirements:
+```
+pip3 install -r requirements.txt
+```
+5 ) `Run wscan` using the following command:
 ```
 python3 wscan.py -h
 ```
