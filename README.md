@@ -70,7 +70,7 @@ examples:
 ## 🎬 WScan Example
 <div align="center">
   
-![demo](https://github.com/Keyj33k/WScan/blob/main/img/wscan_example.png?raw=true)
+![demo](https://github.com/Keyj33k/WScan/blob/main/img/output_example.png?raw=true)
   
 </div>
 
