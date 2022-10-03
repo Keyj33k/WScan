@@ -38,7 +38,7 @@ python3 wscan.py -h
 ## Options/Usage
 
 ```
-usage: main.py [-h] -u target url [-c] [-r] [-i] [-a] [-p] [-f first port] [-l last port]
+usage: wscan.py [-h] -u target url [-c] [-r] [-i] [-a] [-p] [-f first port] [-l last port]
 
 WScan - Web Server Scanner
 
