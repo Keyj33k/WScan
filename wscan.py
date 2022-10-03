@@ -99,7 +99,7 @@ if __name__ == "__main__":
     parser.add_argument("-r", "--head", action="store_true", help="server header")
     parser.add_argument("-i", "--ipv4", action="store_true", help="ipv4 informations")
     parser.add_argument("-a", "--all", action="store_true", help="complete scan")
-    parser.add_argument("-p", "--pscan", action="store_true", help="add port scan to main scan")
+    parser.add_argument("-p", "--pscan", action="store_true", help="port scan")
     parser.add_argument("-f", "--first", type=int, metavar="first port",
                         help="the first port for port scan if enabled")
     parser.add_argument("-l", "--last", type=int, metavar="last port",
