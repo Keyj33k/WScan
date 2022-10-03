@@ -109,8 +109,8 @@ if __name__ == "__main__":
     def display_help():
         parser.print_help()
         print(("\nexamples:\n"
-               "  wscan.py -u example.com -f 1 -l 100 -a -u example.com\n"
-               "  wscan.py -u example.com -r -i -u example.com\n"
+               "  wscan.py -f 1 -l 100 -a -u example.com\n"
+               "  wscan.py -r -u example.com -i\n"
                "  wscan.py -u example.com -p -f 50 -l 100"))
         exit(1)
 
