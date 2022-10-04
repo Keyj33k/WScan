@@ -27,24 +27,24 @@ Version: 0.0.2
 def addr_conv(url_to_conv: str):
     return f"http://{url_to_conv}/"
 
+def port_check(start_port: int, last_port: int):
+    if start_port > last_port:
+        print("port scan canceled: invalid order")
+        return False
+    elif start_port >= 65534 or start_port <= 0:
+        print(f"port scan canceled: value {start_port} is invalid")
+        return False
+    elif last_port >= 65535 or last_port <= 0:
+        print(f"port scan canceled: value {last_port} is invalid")
+        return False
+    else:
+        return True
+
 class WScan:
     def __init__(self, uniformresourcelocator: str, begin_port: int, last_port: int):
         self.last_port = last_port
         self.begin_port = begin_port
         self.uniformresourcelocator = uniformresourcelocator
-
-    def port_check(self):
-        if self.begin_port > self.last_port:
-            print("port scan canceled: invalid order")
-            exit(1)
-        elif self.begin_port >= 65534 or self.begin_port <= 0:
-            print(f"port check canceled: value {self.begin_port} is invalid")
-            exit(1)
-        elif self.last_port >= 65535 or self.last_port <= 0:
-            print(f"port check canceled: value {self.last_port} is invalid")
-            exit(1)
-        else:
-            return True
 
     def port_scan(self):
         for port in range(self.begin_port, self.last_port):
@@ -150,6 +150,8 @@ if __name__ == "__main__":
         display_help()
     elif vars(args)["sub"] is True and vars(args)["wordl"] is None:
         print("you forgot to enter a wordlist")
+        exit(1)
+    elif vars(args)["pscan"] is True and port_check(args.first, args.last) is False:
         exit(1)
 
     try:
