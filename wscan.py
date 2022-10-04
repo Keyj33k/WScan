@@ -13,6 +13,7 @@ try:
     from urllib.parse import urlparse
     from sys import exit
     from time import sleep
+    from whois import whois
 except ImportError:
     raise RuntimeError(('cannot run wscan because of missing modules. '
                         'Run "pip3 install -r requirements.txt" to fix this issue.'))
@@ -108,6 +109,9 @@ class WScan:
             print("No subdomains were found, try another wordlist")
             exit(1)
 
+    def whois_lookup(self):
+        print(whois(self.uniformresourcelocator).text)
+
 
 if __name__ == "__main__":
     print(figlet_format("wscan", font="graffiti"))
@@ -120,6 +124,7 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--url", type=str, metavar="target url",
                         help="target url ( format=example.com )", required=True)
     parser.add_argument("-a", "--all", action="store_true", help="complete scan")
+    parser.add_argument("-k", "--lookup", action="store_true", help="whois lookup")
     parser.add_argument("-c", "--links", action="store_true", help="collect links + status codes")
     parser.add_argument("-r", "--head", action="store_true", help="server header")
     parser.add_argument("-i", "--ipv4", action="store_true", help="ipv4 informations")
@@ -172,6 +177,9 @@ if __name__ == "__main__":
             wscan.links()
             print(f"\nopen ports\n{'=' * 60}")
             wscan.port_scan()
+        if vars(args)["lookup"] is True:
+            print(f"\nwhois lookup\n{'=' * 60}")
+            wscan.whois_lookup()
         if vars(args)["head"] is True:
             print(f"\nhttp response header\n{'=' * 60}")
             wscan.http_header()
@@ -188,7 +196,7 @@ if __name__ == "__main__":
             print(f"\nactive subdomains\n{'=' * 60}")
             wscan.subdomain_scanner("subdomains.txt") if args.wordl == "default" else wscan.subdomain_scanner(args.wordl)
 
-        print(f"\n\nwscan done: scanned {args.url} in {datetime.now() - scan_start}")
+        print(f"\n\nwscan done in {datetime.now() - scan_start}")
     except KeyboardInterrupt:
         print("\nwscan exits due interruption")
     except gaierror:
