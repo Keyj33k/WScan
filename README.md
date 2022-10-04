@@ -7,11 +7,12 @@
 </div>
 
 ## What WScan Will Scan For  
-- server details like ipv4/ipv6 addresses, status code and the HTTP header<br>
+- server details like ipv4/ipv6 addresses, status code, the HTTP header and whois lookup<br>
 - all links with the associated status codes<br>
 - ipv4 data like country, region, city, lat, lon, timezone etc.<br>
 - optional port scanning config with service detection<br>
 - scan target server for subdomains
+
 
 ## :rocket: Getting Started: 
 
@@ -59,6 +60,7 @@ options:
   -u target url, --url target url
                         target url ( format=example.com )
   -a, --all             complete scan
+  -k, --lookup          whois lookup
   -c, --links           collect links + status codes
   -r, --head            server header
   -i, --ipv4            ipv4 informations
