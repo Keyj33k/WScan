@@ -48,6 +48,7 @@ class WScan:
         self.uniformresourcelocator = uniformresourcelocator
 
     def port_scan(self):
+        print(f"\nopen ports\n{'=' * 60}")
         for port in range(self.begin_port, self.last_port):
             with socket(AF_INET, SOCK_STREAM) as port_scan:
                 port_scan.settimeout(5)
@@ -71,6 +72,7 @@ class WScan:
         return soup.title.text
 
     def links(self):
+        print(f"\ncollect links\n{'=' * 60}")
         soup = BeautifulSoup(get(addr_conv(self.uniformresourcelocator)).content, "html.parser")
         for link in soup.find_all('a'):
             clink = link.get('href')
@@ -81,17 +83,20 @@ class WScan:
                 pass
 
     def ip_data(self):
+        print(f"\nipv4 address data\n{'=' * 60}")
         tar_ip = gethostbyname(self.uniformresourcelocator)
         for data in post("http://ip-api.com/batch", json=[{"query": tar_ip}]).json():
             for category, result in data.items():
                 print(f"+ {category}: {result}")
 
     def http_header(self):
+        print(f"\nhttp response header\n{'=' * 60}")
         for category, result in get(addr_conv(self.uniformresourcelocator)).headers.items():
             print(f"+ {category}: {result}")
 
     def subdomain_scanner(self, database):
         active_domains = 0
+        print(f"\nactive subdomains\n{'=' * 60}")
         with open(database, 'r') as file:
             for list_domains in file.read().splitlines():
                 uniformresourcelocator = f"http://{list_domains}.{self.uniformresourcelocator}"
@@ -110,6 +115,7 @@ class WScan:
             exit(1)
 
     def whois_lookup(self):
+        print(f"\nwhois lookup\n{'=' * 60}")
         print(whois(self.uniformresourcelocator).text)
 
 
@@ -169,32 +175,22 @@ if __name__ == "__main__":
                f"+ addresses: {wscan.ipv4_addr()}\n"))
 
         if vars(args)["all"] is True:
-            print(f"\nhttp response header\n{'=' * 60}")
             wscan.http_header()
-            print(f"\nipv4 address data\n{'=' * 60}")
             wscan.ip_data()
-            print(f"\navailable links\n{'=' * 60}")
             wscan.links()
-            print(f"\nopen ports\n{'=' * 60}")
             wscan.port_scan()
-        if vars(args)["lookup"] is True:
-            print(f"\nwhois lookup\n{'=' * 60}")
-            wscan.whois_lookup()
-        if vars(args)["head"] is True:
-            print(f"\nhttp response header\n{'=' * 60}")
-            wscan.http_header()
-        if vars(args)["ipv4"] is True:
-            print(f"\nipv4 address data\n{'=' * 60}")
-            wscan.ip_data()
-        if vars(args)["links"] is True:
-            print(f"\ncollect links\n{'=' * 60}")
-            wscan.links()
-        if vars(args)["pscan"] is True:
-            print(f"\nopen ports\n{'=' * 60}")
-            wscan.port_scan()
+
+        if vars(args)["lookup"] is True: wscan.whois_lookup()
+        if vars(args)["head"] is True: wscan.http_header()
+        if vars(args)["ipv4"] is True: wscan.ip_data()
+        if vars(args)["links"] is True: wscan.links()
+        if vars(args)["pscan"] is True: wscan.port_scan()
+
         if vars(args)["sub"] is True:
-            print(f"\nactive subdomains\n{'=' * 60}")
-            wscan.subdomain_scanner("subdomains.txt") if args.wordl == "default" else wscan.subdomain_scanner(args.wordl)
+            if args.wordl == "default":
+                wscan.subdomain_scanner("subdomains.txt")
+            else:
+                wscan.subdomain_scanner(args.wordl)
 
         print(f"\n\nwscan done in {datetime.now() - scan_start}")
     except KeyboardInterrupt:
