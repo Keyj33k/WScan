@@ -181,7 +181,7 @@ if __name__ == "__main__":
             print(f"\nipv4 address data\n{'=' * 60}")
             wscan.ip_data()
         if vars(args)["links"] is True:
-            print(f"\navailable links\n{'=' * 60}")
+            print(f"\ncollect links\n{'=' * 60}")
             wscan.links()
         if vars(args)["pscan"] is True:
             print(f"\nopen ports\n{'=' * 60}")
