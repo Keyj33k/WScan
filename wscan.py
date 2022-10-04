@@ -38,10 +38,10 @@ class WScan:
             print("port scan canceled: invalid order")
             exit(1)
         elif self.begin_port >= 65534 or self.begin_port <= 0:
-            print(f"port check: value {self.begin_port} is invalid")
+            print(f"port check canceled: value {self.begin_port} is invalid")
             exit(1)
         elif self.last_port >= 65535 or self.last_port <= 0:
-            print(f"port check: value {self.last_port} is invalid")
+            print(f"port check canceled: value {self.last_port} is invalid")
             exit(1)
         else:
             return True
@@ -53,9 +53,9 @@ class WScan:
                 if port_scan.connect_ex((gethostbyname(self.uniformresourcelocator), port)) == 0:
 
                     try:
-                        print(f"TCP, port: {port}, status: open, service: {getservbyport(port)}")
+                        print(f"+ TCP, port: {port}, status: open, service: {getservbyport(port)}")
                     except OSError:
-                        print(f"TCP, port: {port}, status: open, service: unknown")
+                        print(f"+ TCP, port: {port}, status: open, service: unknown")
 
     def ipv4_addr(self):
         ipv6 = "".join(gethostbyaddr(self.uniformresourcelocator)[2])
@@ -75,7 +75,7 @@ class WScan:
             clink = link.get('href')
 
             try:
-                print(f"URL found: {clink} -> status code: {get(clink).status_code}")
+                print(f"+ URL found: {clink} -> status code: {get(clink).status_code}")
             except MissingSchema:
                 pass
 
@@ -83,11 +83,11 @@ class WScan:
         tar_ip = gethostbyname(self.uniformresourcelocator)
         for data in post("http://ip-api.com/batch", json=[{"query": tar_ip}]).json():
             for category, result in data.items():
-                print(f"{category}: {result}")
+                print(f"+ {category}: {result}")
 
     def http_header(self):
         for category, result in get(addr_conv(self.uniformresourcelocator)).headers.items():
-            print(f"{category}: {result}")
+            print(f"+ {category}: {result}")
 
     def subdomain_scanner(self, database):
         active_domains = 0
@@ -98,7 +98,7 @@ class WScan:
 
                 try:
                     get(uniformresourcelocator)
-                    print((f"subdomain found: {uniformresourcelocator} ->" 
+                    print((f"+ subdomain found: {uniformresourcelocator} ->" 
                            f" status code: {get(uniformresourcelocator).status_code}"))
                     active_domains += 1
                 except (ConnectionError, MissingSchema):
@@ -110,6 +110,10 @@ class WScan:
 
 
 if __name__ == "__main__":
+    print(figlet_format("wscan", font="graffiti"))
+    print("\t" * 3 + "Version 0.0.2")
+    print(figlet_format("Web Server Scanner", font="digital"))
+
     parser = ArgumentParser(description="WScan - Web Server Scanner")
     parser.add_argument("-v", "--version", action="version",
                         version="wscan - Web Server Scanner, Version 0.0.2", help=SUPPRESS)
@@ -121,7 +125,7 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--ipv4", action="store_true", help="ipv4 informations")
     parser.add_argument("-s", "--sub", action="store_true", help="scan for subdomains")
     parser.add_argument("-w", "--wordl", type=str, metavar="wordlist",
-                        help="wordlist for subdomain scanning")
+                        help="wordlist for subdomain scanning ( default for standard wordlist )")
     parser.add_argument("-p", "--pscan", action="store_true", help="port scan")
     parser.add_argument("-f", "--first", type=int, metavar="first port",
                         help="the first port for port scan if enabled")
@@ -134,7 +138,8 @@ if __name__ == "__main__":
         print(("\nexamples:\n"
                "  wscan.py -f 1 -l 100 -a -u example.com\n"
                "  wscan.py -r -u example.com -i\n"
-               "  wscan.py -u example.com -p -f 50 -l 100"))
+               "  wscan.py -u example.com -p -f 50 -l 100\n"
+               "  wscan.py -u example.com -s -w default"))
         exit(1)
 
     if (vars(args)["all"] is True and vars(args)["first"] is None
@@ -151,18 +156,14 @@ if __name__ == "__main__":
         wscan = WScan(args.url, args.first, args.last)
         scan_start = datetime.now()
 
-        print(figlet_format("wscan", font="graffiti"))
-        print(figlet_format("Web Server Scanner", font="digital"))
-        print("\t" * 4 + "0.0.2")
-
         if vars(args)["pscan"] is True and wscan.port_check() is False:
             print("\ninvalid port config")
             exit(1)
 
-        print((f"target details\n{'=' * 60}\ntarget: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
-               f"title: {wscan.title()}\n"
-               f"status code: {wscan.status_code()}\n"
-               f"addresses: {wscan.ipv4_addr()}\n"))
+        print((f"target details\n{'=' * 60}\n+ target: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
+               f"+ title: {wscan.title()}\n"
+               f"+ status code: {wscan.status_code()}\n"
+               f"+ addresses: {wscan.ipv4_addr()}\n"))
 
         if vars(args)["all"] is True:
             print(f"\nhttp response header\n{'=' * 60}")
@@ -189,8 +190,7 @@ if __name__ == "__main__":
             print(f"\nactive subdomains\n{'=' * 60}")
             wscan.subdomain_scanner("subdomains.txt") if args.wordl == "default" else wscan.subdomain_scanner(args.wordl)
 
-        print((f"\n\nwscan done\n{'=' * 60}\n"
-               f"scanned {args.url} in {datetime.now() - scan_start}"))
+        print(f"\n\nwscan done: scanned {args.url} in {datetime.now() - scan_start}")
     except KeyboardInterrupt:
         print("\nwscan exits due interruption")
     except gaierror:
