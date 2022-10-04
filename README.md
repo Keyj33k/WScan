@@ -38,7 +38,18 @@ python3 wscan.py -h
 
 ## Options/Usage
 
-```
+```                                 
+__  _  ________ ____ _____    ____  
+\ \/ \/ /  ___// ___\\__  \  /    \ 
+ \     /\___ \\  \___ / __ \|   |  \
+  \/\_//____  >\___  >____  /___|  /
+            \/     \/     \/     \/ 
+
+			                  Version 0.0.2
++-+-+-+ +-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+|W|e|b| |S|e|r|v|e|r| |S|c|a|n|n|e|r|
++-+-+-+ +-+-+-+-+-+-+ +-+-+-+-+-+-+-+
+
 usage: wscan.py [-h] -u target url [-a] [-c] [-r] [-i] [-s] [-w wordlist] [-p] [-f first port] [-l last port]
 
 WScan - Web Server Scanner
@@ -53,7 +64,7 @@ options:
   -i, --ipv4            ipv4 informations
   -s, --sub             scan for subdomains
   -w wordlist, --wordl wordlist
-                        wordlist for subdomain scanning
+                        wordlist for subdomain scanning ( default for standard wordlist )
   -p, --pscan           port scan
   -f first port, --first first port
                         the first port for port scan if enabled
@@ -64,13 +75,14 @@ examples:
   wscan.py -f 1 -l 100 -a -u example.com
   wscan.py -r -u example.com -i
   wscan.py -u example.com -p -f 50 -l 100
+  wscan.py -u example.com -s -w default
 
 ```
 
 ## 🎬 WScan Example
 <div align="center">
   
-![demo](https://github.com/Keyj33k/WScan/blob/main/img/output_example.png?raw=true)
+![demo](https://github.com/Keyj33k/WScan/blob/main/img/wscan_example.png?raw=true)
   
 </div>
 
