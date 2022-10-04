@@ -158,10 +158,6 @@ if __name__ == "__main__":
         wscan = WScan(args.url, args.first, args.last)
         scan_start = datetime.now()
 
-        if vars(args)["pscan"] is True and wscan.port_check() is False:
-            print("\ninvalid port config")
-            exit(1)
-
         print((f"target details\n{'=' * 60}\n+ target: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
                f"+ title: {wscan.title()}\n"
                f"+ status code: {wscan.status_code()}\n"
