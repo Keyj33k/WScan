@@ -154,7 +154,8 @@ if __name__ == "__main__":
         exit(1)
 
     if (vars(args)["all"] is True and vars(args)["first"] is None
-            or vars(args)["all"] is True and vars(args)["last"] is None):
+        or vars(args)["all"] is True and vars(args)["last"] is None
+        or vars(args)["all"] is True and vars(args)["wordl"] is None):
         display_help()
     elif (vars(args)["pscan"] is True and vars(args)["first"] is None
           or vars(args)["pscan"] is True and vars(args)["last"] is None):
@@ -173,24 +174,27 @@ if __name__ == "__main__":
                f"+ title: {wscan.title()}\n"
                f"+ status code: {wscan.status_code()}\n"
                f"+ addresses: {wscan.ipv4_addr()}\n"))
+        
+        def wordl_config(wordlist: str):
+            if wordlist == "default":
+                wscan.subdomain_scanner("subdomains.txt")
+            else:
+                wscan.subdomain_scanner(wordlist)
 
         if vars(args)["all"] is True:
             wscan.http_header()
             wscan.ip_data()
+            wscan.whois_lookup()
             wscan.links()
             wscan.port_scan()
+            wscan.subdomain_scanner(wordl_config(args.wordl))
 
         if vars(args)["lookup"] is True: wscan.whois_lookup()
         if vars(args)["head"] is True: wscan.http_header()
         if vars(args)["ipv4"] is True: wscan.ip_data()
         if vars(args)["links"] is True: wscan.links()
         if vars(args)["pscan"] is True: wscan.port_scan()
-
-        if vars(args)["sub"] is True:
-            if args.wordl == "default":
-                wscan.subdomain_scanner("subdomains.txt")
-            else:
-                wscan.subdomain_scanner(args.wordl)
+        if vars(args)["sub"] is True: wordl_config(args.wordl)
 
         print(f"\n\nwscan done in {datetime.now() - scan_start}")
     except KeyboardInterrupt:
