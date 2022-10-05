@@ -54,7 +54,7 @@ class WScan:
         print(f"\nopen ports\n{'=' * 60}")
         for port in range(self.begin_port, self.last_port):
             with socket(AF_INET, SOCK_STREAM) as port_scan:
-                port_scan.settimeout(5)
+                port_scan.settimeout(2)
                 if port_scan.connect_ex((gethostbyname(self.uniformresourcelocator), port)) == 0:
 
                     try:
