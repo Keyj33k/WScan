@@ -56,7 +56,6 @@ class WScan:
             with socket(AF_INET, SOCK_STREAM) as port_scan:
                 port_scan.settimeout(2)
                 if port_scan.connect_ex((gethostbyname(self.uniformresourcelocator), port)) == 0:
-
                     try:
                         print(f"+ TCP, port: {port}, status: open, service: {getservbyport(port)}")
                     except OSError:
@@ -110,8 +109,7 @@ class WScan:
                     pass
 
         if active_domains == 0:
-            print("No subdomains were found, try another wordlist")
-            exit(1)
+            exit("\nno subdomains were found, try another wordlist")
 
     def whois_lookup(self):
         print(f"\nwhois lookup\n{'=' * 60}\n{whois(self.uniformresourcelocator).text}")
@@ -149,7 +147,7 @@ if __name__ == "__main__":
                "  wscan.py -r -u example.com -i\n"
                "  wscan.py -u example.com -p -f 50 -l 100\n"
                "  wscan.py -u example.com -s -w default"))
-        exit(1)
+        exit("\nwscan exits due invalid configurations")
 
     if (vars(args)["all"] is True and vars(args)["first"] is None
         or vars(args)["all"] is True and vars(args)["last"] is None
@@ -159,8 +157,7 @@ if __name__ == "__main__":
           or vars(args)["pscan"] is True and vars(args)["last"] is None):
         display_help()
     elif vars(args)["sub"] is True and vars(args)["wordl"] is None:
-        print("you forgot to enter a wordlist")
-        exit(1)
+        exit("\nyou forgot to enter a wordlist")
     elif vars(args)["pscan"] is True and port_check(args.first, args.last) is False:
         exit(1)
 
@@ -174,11 +171,9 @@ if __name__ == "__main__":
                f"+ status code: {wscan.status_code()}\n"
                f"+ addresses: {wscan.ip_addrs()}\n"))
         
-        def sub_scan_opt(wordlist: int):
-            return {
-                0: wscan.subdomain_scanner("subdomains.txt"),
-                1: wscan.subdomain_scanner(wordlist)
-            }.get(wordlist)
+        def sub_scanner_conf():
+            options = {0: "subdomains.txt", 1: args.wordl}
+            wscan.subdomain_scanner(options[0]) if args.wordl == "default" else wscan.subdomain_scanner(options[1])
 
         if vars(args)["all"] is True:
             wscan.http_header()
@@ -186,14 +181,14 @@ if __name__ == "__main__":
             wscan.whois_lookup()
             wscan.links()
             wscan.port_scan()
-            sub_scan_opt(0) if args.wordl == "default" else sub_scan_opt(1)
+            sub_scanner_conf()
 
         if vars(args)["lookup"] is True: wscan.whois_lookup()
         if vars(args)["head"] is True: wscan.http_header()
         if vars(args)["ipv4"] is True: wscan.ip_data()
         if vars(args)["links"] is True: wscan.links()
         if vars(args)["pscan"] is True: wscan.port_scan()
-        if vars(args)["sub"] is True: sub_scan_opt(0) if args.wordl == "default" else sub_scan_opt(1)
+        if vars(args)["sub"] is True: sub_scanner_conf()
 
         print(f"\n\nwscan done in {datetime.now() - scan_start}")
     except KeyboardInterrupt:
