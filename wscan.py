@@ -74,17 +74,17 @@ class WScan:
     def links(self):
         print(f"\ncollect links from target\n{'=' * 60}")
         for link in soup(self.uniformresourcelocator).find_all('a'):
-            clink = link.get('href')
+            current_url = link.get("href")
 
             try:
-                print(f"+ URL found: {clink} -> status code: {get(clink).status_code}")
+                print(f"+ URL found: {current_url} -> status code: {get(current_url).status_code}")
             except MissingSchema:
                 pass
 
     def ip_data(self):
         print(f"\nipv4 address data\n{'=' * 60}")
-        tar_ip = gethostbyname(self.uniformresourcelocator)
-        for data in post("http://ip-api.com/batch", json=[{"query": tar_ip}]).json():
+        target_ip = gethostbyname(self.uniformresourcelocator)
+        for data in post("http://ip-api.com/batch", json=[{"query": target_ip}]).json():
             for category, result in data.items():
                 print(f"+ {category}: {result}")
 
@@ -114,8 +114,7 @@ class WScan:
             exit(1)
 
     def whois_lookup(self):
-        print(f"\nwhois lookup\n{'=' * 60}")
-        print(whois(self.uniformresourcelocator).text)
+        print(f"\nwhois lookup\n{'=' * 60}\n{whois(self.uniformresourcelocator).text}")
 
 
 if __name__ == "__main__":
@@ -172,7 +171,7 @@ if __name__ == "__main__":
         print((f"target details\n{'=' * 60}\n+ target: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
                f"+ title: {wscan.website_title()}\n"
                f"+ status code: {wscan.status_code()}\n"
-               f"+ addresses: {wscan.ipv4_addr()}\n"))
+               f"+ addresses: {wscan.ip_addrs()}\n"))
         
         def sub_scan_opt(wordlist: int):
             return {
