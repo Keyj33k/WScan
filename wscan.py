@@ -40,6 +40,9 @@ def port_check(start_port: int, last_port: int):
         return False
     else:
         return True
+    
+def soup(url: str):
+    return BeautifulSoup(get(addr_conv(url)).content, "html.parser")
 
 class WScan:
     def __init__(self, uniformresourcelocator: str, begin_port: int, last_port: int):
@@ -67,14 +70,12 @@ class WScan:
     def status_code(self):
         return get(addr_conv(self.uniformresourcelocator)).status_code
 
-    def title(self):
-        soup = BeautifulSoup(get(addr_conv(self.uniformresourcelocator)).content, "html.parser")
-        return soup.title.text
+    def website_title(self):
+        return soup(self.uniformresourcelocator).title.text
 
     def links(self):
-        print(f"\ncollect links\n{'=' * 60}")
-        soup = BeautifulSoup(get(addr_conv(self.uniformresourcelocator)).content, "html.parser")
-        for link in soup.find_all('a'):
+        print(f"\ncollect links from target\n{'=' * 60}")
+        for link in soup(self.uniformresourcelocator).find_all('a'):
             clink = link.get('href')
 
             try:
@@ -171,7 +172,7 @@ if __name__ == "__main__":
         scan_start = datetime.now()
 
         print((f"target details\n{'=' * 60}\n+ target: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
-               f"+ title: {wscan.title()}\n"
+               f"+ title: {wscan.website_title()}\n"
                f"+ status code: {wscan.status_code()}\n"
                f"+ addresses: {wscan.ipv4_addr()}\n"))
         
