@@ -28,6 +28,9 @@ Version: 0.0.2
 def addr_conv(url_to_conv: str):
     return f"http://{url_to_conv}/"
 
+def pscan_outp(port: int, service: str):
+    print(f"+ TCP, port: {port}, status: open, service: {service}")
+
 def port_check(start_port: int, last_port: int):
     if start_port > last_port:
         print("port scan canceled: invalid order")
@@ -57,9 +60,9 @@ class WScan:
                 port_scan.settimeout(2)
                 if port_scan.connect_ex((gethostbyname(self.uniformresourcelocator), port)) == 0:
                     try:
-                        print(f"+ TCP, port: {port}, status: open, service: {getservbyport(port)}")
+                        pscan_outp(port, getservbyport(port))
                     except OSError:
-                        print(f"+ TCP, port: {port}, status: open, service: unknown")
+                        pscan_outp(port, "unknown")
 
     def ip_addrs(self):
         return f"{gethostbyname(self.uniformresourcelocator)}/{''.join(gethostbyaddr(self.uniformresourcelocator)[2])}"
