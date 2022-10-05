@@ -62,10 +62,8 @@ class WScan:
                     except OSError:
                         print(f"+ TCP, port: {port}, status: open, service: unknown")
 
-    def ipv4_addr(self):
-        ipv6 = "".join(gethostbyaddr(self.uniformresourcelocator)[2])
-        ipv4 = gethostbyname(self.uniformresourcelocator)
-        return f"{ipv4}/{ipv6}"
+    def ip_addrs(self):
+        return f"{gethostbyname(self.uniformresourcelocator)}/{''.join(gethostbyaddr(self.uniformresourcelocator)[2])}"
 
     def status_code(self):
         return get(addr_conv(self.uniformresourcelocator)).status_code
