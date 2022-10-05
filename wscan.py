@@ -168,7 +168,8 @@ if __name__ == "__main__":
         wscan = WScan(args.url, args.first, args.last)
         scan_start = datetime.now()
 
-        print((f"target details\n{'=' * 60}\n+ target: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
+        print((f"target details\n{'=' * 60}\n"
+               f"+ target: {args.url} ( {''.join(gethostbyaddr(args.url)[0])} )\n"
                f"+ title: {wscan.website_title()}\n"
                f"+ status code: {wscan.status_code()}\n"
                f"+ addresses: {wscan.ip_addrs()}\n"))
