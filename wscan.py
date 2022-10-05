@@ -178,8 +178,8 @@ if __name__ == "__main__":
         
         def sub_scan_opt(wordlist: int):
             return {
-                1: wscan.subdomain_scanner("subdomains.txt"),
-                2: wscan.subdomain_scanner(wordlist)
+                0: wscan.subdomain_scanner("subdomains.txt"),
+                1: wscan.subdomain_scanner(wordlist)
             }.get(wordlist)
 
         if vars(args)["all"] is True:
@@ -188,14 +188,14 @@ if __name__ == "__main__":
             wscan.whois_lookup()
             wscan.links()
             wscan.port_scan()
-            sub_scan_opt(1) if args.wordl == "default" else sub_scan_opt(2)
+            sub_scan_opt(0) if args.wordl == "default" else sub_scan_opt(1)
 
         if vars(args)["lookup"] is True: wscan.whois_lookup()
         if vars(args)["head"] is True: wscan.http_header()
         if vars(args)["ipv4"] is True: wscan.ip_data()
         if vars(args)["links"] is True: wscan.links()
         if vars(args)["pscan"] is True: wscan.port_scan()
-        if vars(args)["sub"] is True: sub_scan_opt(1) if args.wordl == "default" else sub_scan_opt(2)
+        if vars(args)["sub"] is True: sub_scan_opt(0) if args.wordl == "default" else sub_scan_opt(1)
 
         print(f"\n\nwscan done in {datetime.now() - scan_start}")
     except KeyboardInterrupt:
