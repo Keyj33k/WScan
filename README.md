@@ -60,7 +60,7 @@ options:
   -u target url, --url target url
                         target url ( format=example.com )
   -a, --all             complete scan
-  -k, --lookup          whois lookup
+  -l, --lookup          whois lookup
   -c, --links           collect links + status codes
   -r, --head            server header
   -i, --ipv4            ipv4 informations
@@ -70,7 +70,7 @@ options:
   -p, --pscan           port scan
   -f first port, --first first port
                         the first port for port scan if enabled
-  -l last port, --last last port
+  -e last port, --last last port
                         the last port for port scan if enabled
 
 examples:
