@@ -34,16 +34,6 @@ def pscan_outp(port: int, service: str, version: str):
         print(f"+ TCP, port: {port}\n\t∟ status: open\n\t∟ service: {service}\n\t∟ version: {version}")
     else:
         print(f"+ TCP, port: {port}\n\t∟ status: open\n\t∟ service: {service}\n\t∟ version: unknown")
-
-def port_check(start_port: int, last_port: int):
-    if start_port > last_port:
-        exit("port scan canceled: invalid order")
-    elif start_port >= 65534 or start_port <= 0:
-        exit(f"port scan canceled: value {start_port} is invalid")
-    elif last_port >= 65535 or last_port <= 0:
-        exit(f"port scan canceled: value {last_port} is invalid")
-    else:
-        return True
     
 def soup(url: str):
     return BeautifulSoup(get(addr_conv(url)).content, "html.parser")
@@ -65,6 +55,13 @@ class WScan:
             return
 
     def port_scan(self):
+        if self.begin_port > self.last_port:
+            exit("port scan canceled: invalid order")
+        elif self.begin_port >= 65534 or self.begin_port <= 0:
+            exit(f"port scan canceled: value {self.begin_port} is invalid")
+        elif self.last_port >= 65535 or self.last_port <= 0:
+            exit(f"port scan canceled: value {self.last_port} is invalid")
+            
         print(f"\nopen ports\n{'=' * 60}")
         for port in range(self.begin_port, self.last_port):
             with socket(AF_INET, SOCK_STREAM) as port_scan:
@@ -199,7 +196,7 @@ def entry_point():
         if vars(args)["head"] is True: wscan.http_header()
         if vars(args)["ipv4"] is True: wscan.ip_data()
         if vars(args)["links"] is True: wscan.links()
-        if vars(args)["pscan"] is True and wscan.port_scan() is True: wscan.port_scan()
+        if vars(args)["pscan"] is True: wscan.port_scan()
         if vars(args)["sub"] is True: sub_scanner_conf()
 
         exit(f"\n\nwscan done in {datetime.now() - scan_start}")
