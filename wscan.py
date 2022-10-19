@@ -4,7 +4,7 @@ try:
     from socket import socket, AF_INET, SOCK_STREAM, getservbyport
     from requests import get, post
     from bs4 import BeautifulSoup
-    from socket import gethostbyaddr, gethostbyname
+    from socket import gethostbyaddr, gethostbyname, error
     from requests.exceptions import MissingSchema, ConnectionError
     from pyfiglet import figlet_format
     from argparse import ArgumentParser, SUPPRESS
@@ -20,27 +20,28 @@ except ImportError:
 
 """
 wscan - Web Server Scanner
+
 Author: Keyjeek
 Date: 03.10.22
-Version: 0.0.2
+Version: 0.0.3
 """
 
 def addr_conv(url_to_conv: str):
     return f"http://{url_to_conv}/"
 
-def pscan_outp(port: int, service: str):
-    print(f"+ TCP, port: {port}, status: open, service: {service}")
+def pscan_outp(port: int, service: str, version: str):
+    if version is not None:
+        print(f"+ TCP, port: {port}\n\t∟ status: open\n\t∟ service: {service}\n\t∟ version: {version}")
+    else:
+        print(f"+ TCP, port: {port}\n\t∟ status: open\n\t∟ service: {service}\n\t∟ version: unknown")
 
 def port_check(start_port: int, last_port: int):
     if start_port > last_port:
-        print("port scan canceled: invalid order")
-        return False
+        exit("port scan canceled: invalid order")
     elif start_port >= 65534 or start_port <= 0:
-        print(f"port scan canceled: value {start_port} is invalid")
-        return False
+        exit(f"port scan canceled: value {start_port} is invalid")
     elif last_port >= 65535 or last_port <= 0:
-        print(f"port scan canceled: value {last_port} is invalid")
-        return False
+        exit(f"port scan canceled: value {last_port} is invalid")
     else:
         return True
     
@@ -53,16 +54,27 @@ class WScan:
         self.begin_port = begin_port
         self.uniformresourcelocator = uniformresourcelocator
 
+    @staticmethod
+    def banner_grabber(address: str, port: int):
+        try:
+            with socket(AF_INET, SOCK_STREAM) as socket_sock:
+                socket_sock.connect_ex((address, port))
+                socket_sock.settimeout(2)
+                return socket_sock.recv(1024).decode().replace("\n", "")
+        except error:
+            return
+
     def port_scan(self):
         print(f"\nopen ports\n{'=' * 60}")
         for port in range(self.begin_port, self.last_port):
             with socket(AF_INET, SOCK_STREAM) as port_scan:
                 port_scan.settimeout(2)
+                grabber = WScan.banner_grabber(self.uniformresourcelocator, port)
                 if port_scan.connect_ex((gethostbyname(self.uniformresourcelocator), port)) == 0:
                     try:
-                        pscan_outp(port, getservbyport(port))
+                        pscan_outp(port, getservbyport(port), grabber)
                     except OSError:
-                        pscan_outp(port, "unknown")
+                        pscan_outp(port, "unknown", grabber)
 
     def ip_addrs(self):
         return f"{gethostbyname(self.uniformresourcelocator)}/{''.join(gethostbyaddr(self.uniformresourcelocator)[2])}"
@@ -117,19 +129,18 @@ class WScan:
     def whois_lookup(self):
         print(f"\nwhois lookup\n{'=' * 60}\n{whois(self.uniformresourcelocator).text}")
 
-
-if __name__ == "__main__":
+def entry_point():
     print(figlet_format("wscan", font="graffiti"))
-    print("\t" * 3 + "Version 0.0.2")
+    print(f"\t{' ' * 7}" * 3 + "v0.0.3")
     print(figlet_format("Web Server Scanner", font="digital"))
 
     parser = ArgumentParser(description="WScan - Web Server Scanner")
     parser.add_argument("-v", "--version", action="version",
-                        version="wscan - Web Server Scanner, Version 0.0.2", help=SUPPRESS)
+                        version="wscan - Web Server Scanner, v0.0.3", help=SUPPRESS)
     parser.add_argument("-u", "--url", type=str, metavar="target url",
                         help="target url ( format=example.com )", required=True)
     parser.add_argument("-a", "--all", action="store_true", help="complete scan")
-    parser.add_argument("-k", "--lookup", action="store_true", help="whois lookup")
+    parser.add_argument("-l", "--lookup", action="store_true", help="whois lookup")
     parser.add_argument("-c", "--links", action="store_true", help="collect links + status codes")
     parser.add_argument("-r", "--head", action="store_true", help="server header")
     parser.add_argument("-i", "--ipv4", action="store_true", help="ipv4 informations")
@@ -139,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument("-p", "--pscan", action="store_true", help="port scan")
     parser.add_argument("-f", "--first", type=int, metavar="first port",
                         help="the first port for port scan if enabled")
-    parser.add_argument("-l", "--last", type=int, metavar="last port",
+    parser.add_argument("-e", "--last", type=int, metavar="last port",
                         help="the last port for port scan if enabled")
     args = parser.parse_args()
 
@@ -153,16 +164,14 @@ if __name__ == "__main__":
         exit("\nwscan exits due invalid configurations")
 
     if (vars(args)["all"] is True and vars(args)["first"] is None
-        or vars(args)["all"] is True and vars(args)["last"] is None
-        or vars(args)["all"] is True and vars(args)["wordl"] is None):
+            or vars(args)["all"] is True and vars(args)["last"] is None
+            or vars(args)["all"] is True and vars(args)["wordl"] is None):
         display_help()
     elif (vars(args)["pscan"] is True and vars(args)["first"] is None
           or vars(args)["pscan"] is True and vars(args)["last"] is None):
         display_help()
     elif vars(args)["sub"] is True and vars(args)["wordl"] is None:
         exit("\nyou forgot to enter a wordlist")
-    elif vars(args)["pscan"] is True and port_check(args.first, args.last) is False:
-        exit(1)
 
     try:
         wscan = WScan(args.url, args.first, args.last)
@@ -173,7 +182,7 @@ if __name__ == "__main__":
                f"+ title: {wscan.website_title()}\n"
                f"+ status code: {wscan.status_code()}\n"
                f"+ addresses: {wscan.ip_addrs()}\n"))
-        
+
         def sub_scanner_conf():
             options = {0: "subdomains.txt", 1: args.wordl}
             wscan.subdomain_scanner(options[0]) if args.wordl == "default" else wscan.subdomain_scanner(options[1])
@@ -190,15 +199,20 @@ if __name__ == "__main__":
         if vars(args)["head"] is True: wscan.http_header()
         if vars(args)["ipv4"] is True: wscan.ip_data()
         if vars(args)["links"] is True: wscan.links()
-        if vars(args)["pscan"] is True: wscan.port_scan()
+        if vars(args)["pscan"] is True and wscan.port_scan() is True: wscan.port_scan()
         if vars(args)["sub"] is True: sub_scanner_conf()
 
-        print(f"\n\nwscan done in {datetime.now() - scan_start}")
-    except KeyboardInterrupt:
-        print("\nwscan exits due interruption")
+        exit(f"\n\nwscan done in {datetime.now() - scan_start}")
     except gaierror:
-        print("\ninvalid url, use a format like this: example.com")
+        exit("\ninvalid url, use a format like this: example.com")
     except (ConnectionError, herror):
-        print(f"\ncannot scan {args.url}")
+        exit(f"\ncannot scan {args.url}")
     except FileNotFoundError:
-        print(f"subdomain scanning failed: wordlist is missing")
+        exit(f"subdomain scanning failed: wordlist is missing")
+
+
+if __name__ == "__main__":
+    try:
+        entry_point()
+    except KeyboardInterrupt:
+        exit("\nwscan exits due interruption")
