@@ -62,7 +62,7 @@ options:
   -a, --all             complete scan
   -l, --lookup          whois lookup
   -c, --links           collect links + status codes
-  -r, --head            server header
+  -r, --head            HTTP header
   -i, --ipv4            ipv4 informations
   -s, --sub             scan for subdomains
   -w wordlist, --wordl wordlist
