@@ -139,7 +139,7 @@ def entry_point():
     parser.add_argument("-a", "--all", action="store_true", help="complete scan")
     parser.add_argument("-l", "--lookup", action="store_true", help="whois lookup")
     parser.add_argument("-c", "--links", action="store_true", help="collect links + status codes")
-    parser.add_argument("-r", "--head", action="store_true", help="server header")
+    parser.add_argument("-r", "--head", action="store_true", help="HTTP header")
     parser.add_argument("-i", "--ipv4", action="store_true", help="ipv4 informations")
     parser.add_argument("-s", "--sub", action="store_true", help="scan for subdomains")
     parser.add_argument("-w", "--wordl", type=str, metavar="wordlist",
